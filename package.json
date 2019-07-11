@@ -1,0 +1,25 @@
+{
+  "name": "allitbooks-search-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/deniz946/allitbooks-search-api.git"
+  },
+  "keywords": [
+    "allitbooks",
+    "e-books",
+    "tech",
+    "books"
+  ],
+  "author": "deniz946",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/deniz946/allitbooks-search-api/issues"
+  },
+  "homepage": "https://github.com/deniz946/allitbooks-search-api#readme"
+}

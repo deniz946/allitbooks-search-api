@@ -1,25 +1,20 @@
 {
   "name": "allitbooks-search-api",
-  "version": "1.0.0",
-  "description": "",
-  "main": "app.js",
+  "version": "0.0.0",
+  "private": true,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "supervisor ./bin/www"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/deniz946/allitbooks-search-api.git"
+  "dependencies": {
+    "async-request": "^1.2.0",
+    "cheerio": "^1.0.0-rc.3",
+    "cookie-parser": "~1.4.4",
+    "debug": "~2.6.9",
+    "dotenv": "^8.0.0",
+    "express": "~4.16.1",
+    "morgan": "~1.9.1"
   },
-  "keywords": [
-    "allitbooks",
-    "e-books",
-    "tech",
-    "books"
-  ],
-  "author": "deniz946",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/deniz946/allitbooks-search-api/issues"
-  },
-  "homepage": "https://github.com/deniz946/allitbooks-search-api#readme"
+  "devDependencies": {
+    "supervisor": "^0.12.0"
+  }
 }

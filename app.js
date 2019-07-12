@@ -17,4 +17,11 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use("/", indexRouter);
 app.use("/search", searchRouter);
 
+app.use(({ errMsg, status = 400 }, req, res, next) => {
+  const err = new Error();
+  err.status = status;
+  err.message = errMsg;
+  res.send(err);
+});
+
 module.exports = app;

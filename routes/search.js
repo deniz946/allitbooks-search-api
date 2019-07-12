@@ -1,29 +1,22 @@
 var express = require("express");
 var router = express.Router();
-const request = require("async-request");
-const cheerio = require("cheerio");
-const scrapeHelper = require("../helpers/scrape-helpers");
-router.get("/", async function(req, res, next) {
-  const URL = process.env.ALLITBOOKS_URL;
+const OperationsController = require("../controllers/OperationsController");
 
-  const searchParam = req.query.search;
-  const searchResultHTML = await request(URL);
-  const $ = cheerio.load(searchResultHTML.body);
-  const booksOnPage = [];
-  try {
-    $("article.post").each((i, element) => {
-      booksOnPage.push({
-        author: scrapeHelper.getAuthor(element, $),
-        title: scrapeHelper.getTitle(element, $),
-        desc: scrapeHelper.getDescription(element, $),
-        link: scrapeHelper.getLink(element, $),
-        thumbnail: scrapeHelper.getThumbnail(element, $)
-      });
-    });
-  } catch (error) {
-    console.log(error);
+router.get("/", async function(req, res, next) {
+  const searchParam = req.query.term;
+  const page = req.query.page || 1;
+
+  if (!searchParam) {
+    next({ errMsg: "no search param provided" });
+    return;
   }
-  res.send(booksOnPage);
+
+  try {
+    const foundBooks = await OperationsController.search(searchParam, page);
+    res.send(foundBooks);
+  } catch (error) {
+    next(error);
+  }
 });
 
 module.exports = router;

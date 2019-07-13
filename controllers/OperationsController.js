@@ -1,7 +1,7 @@
 const request = require("async-request");
 const cheerio = require("cheerio");
 const scrapeHelper = require("../helpers/scrape-helpers");
-
+const URL = require('url').URL;
 /*
     search url - http://www.allitebooks.org/?s=algo
     search url with page - http://www.allitebooks.org/page/2/?s=algo
@@ -22,7 +22,7 @@ class OperationsController {
           author: scrapeHelper.getAuthor(element, $),
           title: scrapeHelper.getTitle(element, $),
           desc: scrapeHelper.getDescription(element, $),
-          downloadPath: new URL(link).pathname,
+          downloadPath: new URL(link).pathname.replace(/\//g, ''),
           thumbnail: scrapeHelper.getThumbnail(element, $)
         });
       });
@@ -33,20 +33,25 @@ class OperationsController {
     }
   }
 
-  async downloadBook(bookUrl) {
-    const searchResultHTML = await request(bookUrl);
+  async downloadBook(bookId) {
+    const BASE_URL = process.env.ALLITBOOKS_URL;
+    const searchResultHTML = await request(`${BASE_URL}/${bookId}`);
     const $ = cheerio.load(searchResultHTML.body);
+    const link = $('span.download-links>a').attr('href');
+   // const bookBinary = await request(link);
+    return link;
   }
 
   _buildSearchUrl(term, page) {
-    const Url = new URL(`${process.env.ALLITBOOKS_URL}/page/${page}/`);
+    const BASE_URL = process.env.ALLITBOOKS_URL;
+    const Url = new URL(`${BASE_URL}/page/${page}/`);
     Url.searchParams.set("s", term);
 
     return Url.toString();
   }
 
   async _getHtmlContent(url) {
-    const searchResultHTML = await request(URL);
+    const searchResultHTML = await request(url);
     return cheerio.load(searchResultHTML.body);
   }
 }

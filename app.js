@@ -4,7 +4,7 @@ const cookieParser = require("cookie-parser");
 const logger = require("morgan");
 
 const indexRouter = require("./routes/index");
-const searchRouter = require("./routes/search");
+const bookRouter = require("./routes/book");
 
 const app = express();
 
@@ -15,7 +15,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/", indexRouter);
-app.use("/search", searchRouter);
+app.use("/book", bookRouter);
 
 app.use(({ errMsg, status = 400 }, req, res, next) => {
   const err = new Error();

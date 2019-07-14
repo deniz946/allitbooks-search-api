@@ -1,20 +1,25 @@
-const request = require("async-request");
+const request = require("request");
 const cheerio = require("cheerio");
 const scrapeHelper = require("../helpers/scrape-helpers");
 const URL = require('url').URL;
+const Q = require('q');
 /*
     search url - http://www.allitebooks.org/?s=algo
     search url with page - http://www.allitebooks.org/page/2/?s=algo
 */
 
 class OperationsController {
-  async search(term, page) {
+  search(term, page) {
     const Url = this._buildSearchUrl(term, page);
+    const deferred = Q.defer();
 
-    const searchResultHTML = await request(Url);
-    const $ = cheerio.load(searchResultHTML.body);
-    const booksOnPage = [];
-    try {
+    request(Url, (err, response) => {
+      if (err) {
+        deferred.reject({ errMsg: error.message, status: 500 })
+      }
+      const $ = cheerio.load(response.body);
+      const booksOnPage = [];
+
       $("article.post").each((i, element) => {
         const link = scrapeHelper.getLink(element, $);
         booksOnPage.push({
@@ -26,20 +31,31 @@ class OperationsController {
           thumbnail: scrapeHelper.getThumbnail(element, $)
         });
       });
+      deferred.resolve(booksOnPage);
+    });
 
-      return booksOnPage;
-    } catch (error) {
-      throw { errMsg: error.message, status: 500 };
-    }
+    return deferred.promise;
   }
 
-  async downloadBook(bookId) {
+  downloadBook(bookId) {
     const BASE_URL = process.env.ALLITBOOKS_URL;
-    const searchResultHTML = await request(`${BASE_URL}/${bookId}`);
-    const $ = cheerio.load(searchResultHTML.body);
-    const link = $('span.download-links>a').attr('href');
-   // const bookBinary = await request(link);
-    return link;
+    const deffered = Q.defer();
+
+    request(`${BASE_URL}/${bookId}`, (err, body) => {
+      if (err) {
+        deferred.reject({ errMsg: error.message, status: 500 })
+      }
+
+      const $ = cheerio.load(body);
+      const link = $('.download-links a').attr('href');
+      if (!link) {
+        deffered.reject({ errMsg: 'There is no book with given id', status: 404})
+      }
+
+      deffered.resolve(link);
+    });
+
+    return deffered.promise;
   }
 
   _buildSearchUrl(term, page) {

@@ -20,7 +20,6 @@ router.get("/search", async function (req, res, next) {
     })
 });
 
-
 router.get('/:bookId', async (req, res, next) => {
   const bookId = req.params.bookId;
 
@@ -30,9 +29,29 @@ router.get('/:bookId', async (req, res, next) => {
   }
 
   try {
-    const bookUrl = await OperationsController.downloadBook(bookId)
+    const bookInfo = await OperationsController.getBookLink(bookId)
+    res.send(bookInfo);
+
+  } catch (error) {
+    next(error);
+    throw error;
+  }
+
+})
+
+
+router.get('/:bookId/download', async (req, res, next) => {
+  const bookId = req.params.bookId;
+
+  if (!bookId) {
+    next({ errMsg: 'no book id provided' });
+    return;
+  }
+
+  try {
+    const bookInfo = await OperationsController.getBookLink(bookId)
     res.setHeader("content-disposition", "attachment; filename=logo.pdf");
-    request(bookUrl).pipe(res);
+    request(bookInfo.link).pipe(res);
 
   } catch (error) {
     next(error);

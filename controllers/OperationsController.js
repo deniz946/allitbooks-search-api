@@ -37,22 +37,23 @@ class OperationsController {
     return deferred.promise;
   }
 
-  downloadBook(bookId) {
+  getBookLink(bookId) {
     const BASE_URL = process.env.ALLITBOOKS_URL;
     const deffered = Q.defer();
 
-    request(`${BASE_URL}/${bookId}`, (err, body) => {
+    request(`${BASE_URL}/${bookId}`, (err, response) => {
       if (err) {
         deferred.reject({ errMsg: error.message, status: 500 })
       }
 
-      const $ = cheerio.load(body);
+      const $ = cheerio.load(response.body);
       const link = $('.download-links a').attr('href');
+      const title = $('.single-title').text();
       if (!link) {
         deffered.reject({ errMsg: 'There is no book with given id', status: 404})
       }
 
-      deffered.resolve(link);
+      deffered.resolve(encodeURI(link));
     });
 
     return deffered.promise;
